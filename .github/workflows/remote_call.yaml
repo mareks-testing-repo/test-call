@@ -16,9 +16,18 @@ jobs:
 
       - name: Install rpm-build and gnupg
         run: sudo apt install -y rpm gnupg
+        
+      - name: Set up GPG
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-keys
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-      - name: Import GPG key
-        run: echo ${{ secrets.GPG_PRIVATE_KEY }} | base64 --decode | gpg --import
+      - name: Prepare RPM Signing Key
+        run: |
+          echo '%_signature gpg' >> ~/.rpmmacros
+          echo '%_gpg_name aerospiketest' >> ~/.rpmmacros
 
       - name: Set GPG key trust
         run: echo ${{ secrets.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
