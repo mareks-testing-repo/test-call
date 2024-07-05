@@ -1,0 +1,30 @@
+name: on-call
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  sign-rpm:
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install rpm-build and gnupg
+        run: sudo apt install -y rpm gnupg
+
+      - name: Import GPG key
+        run: echo ${{ secrets.GPG_PRIVATE_KEY }} | base64 --decode | gpg --import
+
+      - name: Set GPG key trust
+        run: echo ${{ secrets.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
+
+      - name: Sign RPM
+        run: rpmsign --define "_gpg_name AerospikeTest" --addsign app/your.rpm
+
+      - name: Verify signed RPM
+        run: rpmsign --verify app/your.rpm
