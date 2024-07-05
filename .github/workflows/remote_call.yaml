@@ -18,10 +18,10 @@ jobs:
         run: sudo apt install -y rpm gnupg
         
       - name: Import GPG key
-        run: echo ${{ secrets.GPG_PRIVATE_KEY }} | base64 --decode | gpg --import
+        run: echo ${{ vars.GPG_PRIVATE_KEY }} | base64 --decode | gpg --import
 
       - name: Set GPG key trust
-        run: echo ${{ secrets.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
+        run: echo ${{ vars.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
 
       - name: Prepare RPM Signing Key
         run: |
