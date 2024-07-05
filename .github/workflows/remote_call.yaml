@@ -18,14 +18,14 @@ jobs:
         run: sudo apt install -y rpm gnupg
         
       - name: gpg to file
-        run: echo "${{ var.GPG_PRIVATE_KEY }}" > my_secret_file.asc
+        run: echo "${{ vars.GPG_PRIVATE_KEY }}" > my_secret_file.asc
 
       - name: Set up GPG
         run: |
           cat my_secret_file.asc | gpg --batch --import
           gpg --list-keys
         env:
-          GPG_PRIVATE_KEY: ${{ var.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY: ${{ vars.GPG_PRIVATE_KEY }}
 
       - name: Prepare RPM Signing Key
         run: |
@@ -33,7 +33,7 @@ jobs:
           echo '%_gpg_name aerospiketest' >> ~/.rpmmacros
 
       - name: Set GPG key trust
-        run: echo ${{ var.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
+        run: echo ${{ vars.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
 
       - name: Sign RPM
         run: rpmsign --define "_gpg_name AerospikeTest" --addsign app/your.rpm
