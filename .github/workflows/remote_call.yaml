@@ -14,11 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Sign all RPM packages at Packages folder.
-        uses: dante-signal31/rpmsign@v1.0.3
-        with:
-          gpg_private_key: ${{ secrets.GPG_P_K }}
-          gpg_private_key_password: ${{ vars.GPG_PASSPHRASE }}
-          gpg_name: aerospiketest
-          rpm_file: app/your.rpm
-          output_folder: app/
+      - name: Install rpm-build and gnupg
+        run: sudo apt install -y rpm gnupg
+
+      - name: Import GPG key
+        run: echo ${{ secrets.GPG_K_B }} | base64 --decode | gpg --import
+
+      - name: Set GPG key trust
+        run: echo ${{ secrets.GPG_PASS }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
+
+      - name: Sign RPM
+        run: rpmsign --define "_gpg_name AerospikeTest" --addsign app/your.rpm
+
+      - name: Verify signed RPM
+        run: rpmsign --verify app/your.rpm
