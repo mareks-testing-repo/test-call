@@ -18,7 +18,9 @@ jobs:
         run: sudo apt install -y rpm gnupg coreutils
 
       - name: Import GPG key
-        run: echo ${{ secrets.GPG_K_B }} | base64 --decode | gpg --import
+        run: |
+          echo ${{ secrets.GPG_K_B }} | base64 --decode > file.gpg \
+          cat file.gpg | gpg --import
 
       - name: Set GPG key trust
         run: echo ${{ secrets.GPG_PASS }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
