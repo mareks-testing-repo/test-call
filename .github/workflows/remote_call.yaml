@@ -17,15 +17,11 @@ jobs:
       - name: Install rpm-build and gnupg
         run: sudo apt install -y rpm gnupg
         
-      - name: gpg to file
-        run: echo "${{ vars.GPG_PRIVATE_KEY }}" > my_secret_file.asc
+      - name: Import GPG key
+        run: echo ${{ secrets.GPG_PRIVATE_KEY }} | base64 --decode | gpg --import
 
-      - name: Set up GPG
-        run: |
-          echo ${{ vars.GPG_PRIVATE_KEY }} | gpg --batch --import
-          gpg --list-keys
-        env:
-          GPG_PRIVATE_KEY: ${{ vars.GPG_PRIVATE_KEY }}
+      - name: Set GPG key trust
+        run: echo ${{ secrets.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
 
       - name: Prepare RPM Signing Key
         run: |
