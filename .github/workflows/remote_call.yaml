@@ -17,7 +17,7 @@ jobs:
       - name: Sign all RPM packages at Packages folder.
         uses: dante-signal31/rpmsign@v1.0.3
         with:
-          gpg_private_key: ${{ vars.GPG_PRIVATE_KEY }}
+          gpg_private_key: ${{ vars.GPG_PRIVATE_KEY_BASE64 }}
           gpg_private_key_password: ${{ vars.GPG_PASSPHRASE }}
           gpg_name: aerospiketest
           rpm_file: app/your.rpm
