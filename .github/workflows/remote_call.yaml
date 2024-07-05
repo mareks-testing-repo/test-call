@@ -22,7 +22,7 @@ jobs:
 
       - name: Set up GPG
         run: |
-          cat my_secret_file.asc | gpg --batch --import
+          echo $GPG_PRIVATE_KEY | gpg --batch --import
           gpg --list-keys
         env:
           GPG_PRIVATE_KEY: ${{ vars.GPG_PRIVATE_KEY }}
