@@ -14,32 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install rpm-build and gnupg
-        run: sudo apt install -y rpm gnupg
-      - name: Import GPG key
-        run: |
-          echo $GPG_PRIVATE_KEY | gpg --import --batch --yes
-          echo -e "5\ny\n" | gpg --command-fd 0 --expert --edit-key 5B6E4088CAB9B501060C526CE2344BC42E322D28 trust
-        env:
-          GPG_PRIVATE_KEY: ${{ vars.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ vars.GPG_PASSPHRASE }}       
-
-      - name: Import GPG key
-        run: echo ${{ vars.GPG_PRIVATE_KEY }} | gpg --import
-
-      - name: Set GPG key trust
-        run: echo ${{ vars.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
-
-      - name: Prepare RPM Signing Key
-        run: |
-          echo '%_signature gpg' >> ~/.rpmmacros
-          echo '%_gpg_name aerospiketest' >> ~/.rpmmacros
-
-      - name: Set GPG key trust
-        run: echo ${{ vars.GPG_PASSPHRASE }} | gpg --passphrase-fd 0 --pinentry-mode loopback --batch --import-ownertrust
-
-      - name: Sign RPM
-        run: rpmsign --define "_gpg_name AerospikeTest" --addsign app/your.rpm
-
-      - name: Verify signed RPM
-        run: rpmsign --verify app/your.rpm
+      - name: Sign all RPM packages at Packages folder.
+        uses: dante-signal31/rpmsign@v1.0.3
+        with:
+          gpg_private_key: ${{ vars.PRIVATE_GPG_KEY }}
+          gpg_private_key_password: ${{ vars.GPG_KEY_PASSWORD }}
+          gpg_name: aerospiketest
+          rpm_file: app/your.rpm
+          output_folder: SignedPackages/
