@@ -16,7 +16,14 @@ jobs:
 
       - name: Install rpm-build and gnupg
         run: sudo apt install -y rpm gnupg
-        
+      - name: Import GPG key
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
+          echo -e "5\ny\n" | gpg --command-fd 0 --expert --edit-key <YOUR_KEY_ID> trust
+        env:
+          GPG_PRIVATE_KEY: ${{ vars.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ vars.GPG_PASSPHRASE }}       
+
       - name: Import GPG key
         run: echo ${{ vars.GPG_PRIVATE_KEY }} | gpg --import
 
